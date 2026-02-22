@@ -1,0 +1,12 @@
+# Setup (WSL2 note: venv must live on Linux fs, not /mnt/c/):
+#   sudo apt update && sudo apt install -y python3-pip python3-venv
+#   python3 -m venv ~/.venvs/person_detection
+#   source ~/.venvs/person_detection/bin/activate
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+#   pip install -r requirements.txt
+
+# YOLO (Ultralytics)
+ultralytics
+
+# OpenCV
+opencv-python

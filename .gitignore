@@ -1,0 +1,14 @@
+# Dataset
+/MERL_Shopping_Dataset/
+*.mp4
+
+# Virtual environments
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Model weights
+*.pt
+*.onnx
