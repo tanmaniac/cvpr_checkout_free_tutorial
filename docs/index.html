@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CV at Scale: Checkout-Free Retail &mdash; CVPR 2026 Tutorial</title>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #222;
+      background: #fff;
+    }
+    a { color: #1565c0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Navbar ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #1a237e;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 0.75rem 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    nav a {
+      color: #e8eaf6;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    nav a:hover { color: #fff; text-decoration: none; }
+
+    /* ── Hero ── */
+    header {
+      background: linear-gradient(135deg, #1a237e 0%, #283593 60%, #3949ab 100%);
+      color: #fff;
+      text-align: center;
+      padding: 4rem 1.5rem 3rem;
+    }
+    header .venue {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #90caf9;
+      margin-bottom: 1rem;
+    }
+    header h1 {
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      font-weight: 800;
+      line-height: 1.25;
+      max-width: 860px;
+      margin: 0 auto 1.5rem;
+    }
+    header .meta {
+      color: #c5cae9;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+    .author-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .author-pill {
+      text-align: center;
+    }
+    .author-pill .name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .author-pill .affil {
+      font-size: 0.85rem;
+      color: #9fa8da;
+    }
+    .author-pill .email {
+      font-size: 0.8rem;
+      color: #7986cb;
+    }
+
+    /* ── Sections ── */
+    section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+    section + section {
+      border-top: 1px solid #e8eaf6;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #1a237e;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 3px solid #3949ab;
+      display: inline-block;
+    }
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #283593;
+      margin: 1.25rem 0 0.5rem;
+    }
+    p { margin-bottom: 0.9rem; }
+    p:last-child { margin-bottom: 0; }
+
+    /* ── Pillars ── */
+    .pillars {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin: 1.5rem 0;
+    }
+    .pillar {
+      background: #e8eaf6;
+      border-left: 4px solid #3949ab;
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+    }
+    .pillar strong {
+      display: block;
+      color: #1a237e;
+      margin-bottom: 0.3rem;
+    }
+    .pillar p { font-size: 0.88rem; margin: 0; color: #444; }
+
+    /* ── Learning objectives ── */
+    .objectives {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 0.75rem;
+    }
+    .objectives li {
+      background: #f3f4fd;
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+    }
+    .objectives li::before {
+      content: "✓";
+      color: #3949ab;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    /* ── Schedule ── */
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .schedule-table thead tr {
+      background: #1a237e;
+      color: #fff;
+    }
+    .schedule-table thead th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 700;
+    }
+    .schedule-table tbody tr:nth-child(even) { background: #f3f4fd; }
+    .schedule-table tbody tr:nth-child(odd)  { background: #fff; }
+    .schedule-table tbody tr.break-row { background: #e3f2fd; }
+    .schedule-table td {
+      padding: 0.65rem 1rem;
+      vertical-align: top;
+    }
+    .schedule-table td.time {
+      white-space: nowrap;
+      font-weight: 600;
+      color: #3949ab;
+      width: 110px;
+    }
+    .schedule-table td.presenter {
+      white-space: nowrap;
+      width: 130px;
+      color: #555;
+    }
+    .schedule-table ul {
+      margin: 0.3rem 0 0 1.1rem;
+      padding: 0;
+      color: #555;
+    }
+    .schedule-table li { margin-bottom: 0.15rem; }
+    .talk-title { font-weight: 700; color: #1a237e; }
+    .demo-tag {
+      display: inline-block;
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #a5d6a7;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.1rem 0.4rem;
+      margin-top: 0.3rem;
+    }
+
+    /* ── Organizer cards ── */
+    .organizer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .organizer-card {
+      border: 1px solid #c5cae9;
+      border-radius: 10px;
+      padding: 1.5rem 1.25rem;
+      text-align: center;
+      transition: box-shadow 0.2s;
+    }
+    .organizer-card:hover { box-shadow: 0 4px 18px rgba(26,35,126,0.12); }
+    .organizer-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #3949ab;
+      color: #fff;
+      font-size: 1.6rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .organizer-card h3 {
+      margin: 0 0 0.2rem;
+      font-size: 1rem;
+      color: #1a237e;
+    }
+    .organizer-card .org-affil {
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 0.4rem;
+    }
+    .organizer-card .org-email {
+      font-size: 0.8rem;
+      color: #1565c0;
+    }
+    .organizer-card .org-bio {
+      margin-top: 0.75rem;
+      font-size: 0.82rem;
+      color: #555;
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    /* ── Audience ── */
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .audience-item {
+      background: #f3f4fd;
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+      font-size: 0.88rem;
+    }
+    .audience-item strong { display: block; color: #1a237e; margin-bottom: 0.2rem; }
+
+    /* ── References ── */
+    ol.refs {
+      padding-left: 1.25rem;
+      font-size: 0.88rem;
+      color: #444;
+    }
+    ol.refs li { margin-bottom: 0.5rem; }
+
+    /* ── Footer ── */
+    footer {
+      background: #1a237e;
+      color: #9fa8da;
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: 0.82rem;
+    }
+    footer a { color: #90caf9; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      nav { gap: 1rem; font-size: 0.8rem; }
+      header { padding: 2.5rem 1rem 2rem; }
+      .schedule-table td.time,
+      .schedule-table td.presenter { width: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav>
+  <a href="#about">About</a>
+  <a href="#schedule">Schedule</a>
+  <a href="#organizers">Organizers</a>
+  <a href="#audience">Audience</a>
+  <a href="#resources">Resources</a>
+</nav>
+
+<!-- ── Hero ── -->
+<header>
+  <div class="venue">CVPR 2026 Tutorial &mdash; Half-Day (3.5 hours)</div>
+  <h1>Computer Vision at Scale: Multi-Camera Tracking, Calibration, and Event Detection for Checkout-Free Retail</h1>
+  <div class="meta">In-person with live demonstration &middot; Virtual streaming available</div>
+
+  <div class="author-row">
+    <div class="author-pill">
+      <div class="name">Hareesh Kolluru</div>
+      <div class="affil">Head of AI/ML, Motive</div>
+      <div class="email">sethuhareesh.kolluru@gmail.com</div>
+    </div>
+    <div class="author-pill">
+      <div class="name">Motilal Agarwal</div>
+      <div class="affil">Chief Scientist &amp; Co-founder, Zippin</div>
+      <div class="email">motilal76@yahoo.com</div>
+    </div>
+    <div class="author-pill">
+      <div class="name">Tanmay Bangalore</div>
+      <div class="affil">Senior Software Engineer, Meta</div>
+      <div class="email">tanmaybangalore@gmail.com</div>
+    </div>
+  </div>
+</header>
+
+<!-- ── About ── -->
+<section id="about">
+  <h2>About</h2>
+  <p>
+    Checkout-free retail represents one of the most challenging real-world computer vision deployments,
+    requiring reliable performance across hundreds of sites and millions of interactions. This tutorial
+    bridges academic research and production deployment by framing checkout-free retail as a canonical
+    large-scale multi-camera vision systems problem.
+  </p>
+  <p>
+    The tutorial focuses on three foundational pillars—presented as generalizable computer vision problems
+    rather than application-specific solutions. Each component is discussed in terms of its underlying
+    formulations, scalability constraints, failure modes, and design tradeoffs that transfer directly to
+    autonomous driving, smart spaces, sports analytics, warehouses, and urban sensing.
+  </p>
+
+  <div class="pillars">
+    <div class="pillar">
+      <strong>Automatic Multi-Camera Calibration</strong>
+      <p>Continuous online estimation addressing drift and partial failures using deep learning and conventional CV pipelines.</p>
+    </div>
+    <div class="pillar">
+      <strong>Real-Time Multi-Camera Tracking</strong>
+      <p>Global data association under asynchronous, unreliable observations via integer programming and graph-based formulations.</p>
+    </div>
+    <div class="pillar">
+      <strong>Structured Event Detection</strong>
+      <p>Inference from partial visual evidence with edge computing, Kubernetes deployment, and CPU/GPU/TPU optimization.</p>
+    </div>
+  </div>
+
+  <p>
+    A central theme is how infrastructure constraints—including limited bandwidth, latency requirements,
+    camera reliability, and edge computing budgets—fundamentally shape algorithmic and architectural
+    decisions. Attendees will learn how classical and modern deep learning techniques are adapted for
+    continuous online operation, partial observability, and 99.9%+ system reliability.
+  </p>
+
+  <h3>Key Learning Objectives</h3>
+  <ul class="objectives">
+    <li>Master automatic multi-camera calibration under scale, drift, and partial observability</li>
+    <li>Understand real-time tracking under asynchrony and missing data</li>
+    <li>Learn structured event inference in multi-camera systems</li>
+    <li>Recognize how infrastructure constraints drive architectural decisions</li>
+    <li>Design systems for reliability at scale</li>
+  </ul>
+
+  <h3>Live Demonstration</h3>
+  <p>
+    Attendees will interact with a live multi-camera perception system demonstrating online calibration,
+    global multi-object tracking, and structured event inference under realistic bandwidth, latency, and
+    hardware constraints. The system operates fully offline using local compute and networking, with
+    pre-recorded fallback visualizations for all scenarios. Each component (calibration, tracking, event
+    inference) can be demonstrated independently.
+  </p>
+
+  <h3>Broader Impact</h3>
+  <p>
+    While checkout-free retail serves as the motivating application, the tutorial deliberately abstracts
+    away domain-specific details to focus on generalizable formulations applicable to autonomous vehicles,
+    warehouses, smart cities, and sports analytics—any application requiring automatic multi-camera
+    calibration, real-time edge analysis, robust event detection with limited bandwidth, and scale
+    deployment. The systems discussed have contributed to large-scale commercial deployments recognized
+    through industry innovation awards and government-recognized R&amp;D programs.
+  </p>
+</section>
+
+<!-- ── Schedule ── -->
+<section id="schedule">
+  <h2>Schedule</h2>
+  <table class="schedule-table">
+    <thead>
+      <tr>
+        <th>Duration</th>
+        <th>Topic</th>
+        <th>Presenter</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="time">15 min</td>
+        <td>
+          <span class="talk-title">Introduction &amp; Multi-Camera Vision at Scale</span>
+          <ul>
+            <li>Industry scale and infrastructure constraints</li>
+            <li>Live demo setup introduction</li>
+          </ul>
+        </td>
+        <td class="presenter">All</td>
+      </tr>
+      <tr>
+        <td class="time">60 min</td>
+        <td>
+          <span class="talk-title">Automatic Multi-Camera Calibration under Scale, Drift, and Partial Observability</span>
+          <ul>
+            <li>Deep learning: SuperPoint, LoFTR, bundle adjustment</li>
+            <li>Conventional CV: SIFT/ORB, SfM, homography</li>
+            <li>Production: online refinement, failure detection</li>
+          </ul>
+          <span class="demo-tag">&#9654; Live demo: Calibration visualization</span>
+        </td>
+        <td class="presenter">Agarwal</td>
+      </tr>
+      <tr class="break-row">
+        <td class="time">15 min</td>
+        <td><span class="talk-title">Break</span> &mdash; Attendees interact with demo</td>
+        <td class="presenter">&mdash;</td>
+      </tr>
+      <tr>
+        <td class="time">45 min</td>
+        <td>
+          <span class="talk-title">Real-Time Multi-Camera Tracking under Asynchrony and Missing Data</span>
+          <ul>
+            <li>Global optimization via integer programming</li>
+            <li>Graph-based formulation, solver strategies</li>
+            <li>Camera failures, async data, occlusions</li>
+          </ul>
+          <span class="demo-tag">&#9654; Live demo: Tracking &amp; occlusion handling</span>
+        </td>
+        <td class="presenter">Kolluru</td>
+      </tr>
+      <tr>
+        <td class="time">45 min</td>
+        <td>
+          <span class="talk-title">Structured Event Inference and Reliability in Multi-Camera Vision Systems</span>
+          <ul>
+            <li>Hand-shelf interactions, multi-camera fusion</li>
+            <li>Edge computing, Kubernetes deployment</li>
+            <li>CPU/GPU/TPU optimization, simulation stores</li>
+            <li>Case studies and failure modes</li>
+          </ul>
+          <span class="demo-tag">&#9654; Live demo: Product interaction detection</span>
+        </td>
+        <td class="presenter">Bangalore + All</td>
+      </tr>
+      <tr class="break-row">
+        <td class="time">30 min</td>
+        <td>
+          <span class="talk-title">Interactive Q&amp;A &amp; Hands-on Demo</span>
+          <ul>
+            <li>Attendees test live checkout-free system</li>
+          </ul>
+        </td>
+        <td class="presenter">All</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── Organizers ── -->
+<section id="organizers">
+  <h2>Organizers</h2>
+  <div class="organizer-grid">
+
+    <div class="organizer-card">
+      <div class="organizer-avatar">HK</div>
+      <h3>Hareesh Kolluru</h3>
+      <div class="org-affil">Head of AI/ML, Motive</div>
+      <div class="org-email">sethuhareesh.kolluru@gmail.com</div>
+      <p class="org-bio">
+        Previously led deployment of checkout-free shopping platforms to 250+ stores worldwide at Zippin,
+        visual search at Slyce, and served as Principal Architect for Self-Driving at Faraday Future.
+        Holds an M.S. from UMass Amherst and 6 U.S. patents in computer vision, autonomous driving,
+        and edge AI. Recipient of the Sports Business Journal Best Innovation Award (2022) and
+        IDC Innovator (2023).
+      </p>
+    </div>
+
+    <div class="organizer-card">
+      <div class="organizer-avatar">MA</div>
+      <h3>Dr. Motilal Agarwal</h3>
+      <div class="org-affil">Chief Scientist &amp; Co-founder, Zippin</div>
+      <div class="org-email">motilal76@yahoo.com</div>
+      <p class="org-bio">
+        Previously a principal computer scientist at SRI International, leading large-scale robotics
+        and vision systems for autonomous grasping, surveillance, and biometric capture, with collaborations
+        at Stanford, MIT, and Carnegie Mellon. Ph.D. in Computer Vision from the University of Maryland;
+        B.S. in Computer Science from IIT Delhi. Co-author of AdaMAE (CVPR 2023) and holder of multiple
+        patents in automated checkout.
+      </p>
+    </div>
+
+    <div class="organizer-card">
+      <div class="organizer-avatar">TB</div>
+      <h3>Tanmay Bangalore</h3>
+      <div class="org-affil">Senior Software Engineer, Meta</div>
+      <div class="org-email">tanmaybangalore@gmail.com</div>
+      <p class="org-bio">
+        Previously Staff Software Engineer and Team Lead for Detection &amp; Tracking at Zippin, leading
+        computer vision infrastructure development for checkout-free retail systems deployed across
+        hundreds of stores. Prior experience in autonomous vehicle perception and localization at
+        General Motors and L3Harris Technologies.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── Audience ── -->
+<section id="audience">
+  <h2>Target Audience</h2>
+  <p><strong>Prerequisites:</strong> Basic computer vision (CNNs, detection). Camera geometry helpful but not required.</p>
+  <p><strong>Expected Attendance:</strong> 100&ndash;300 attendees.</p>
+
+  <div class="audience-grid">
+    <div class="audience-item">
+      <strong>CV Researchers</strong>
+      Interested in real-world deployment challenges and production failure modes
+    </div>
+    <div class="audience-item">
+      <strong>Edge AI Engineers</strong>
+      Working on bandwidth-constrained, latency-sensitive vision systems
+    </div>
+    <div class="audience-item">
+      <strong>PhD Students</strong>
+      In tracking, calibration, and video understanding
+    </div>
+    <div class="audience-item">
+      <strong>Industry Practitioners</strong>
+      In retail tech, autonomous vehicles, and warehouses
+    </div>
+    <div class="audience-item">
+      <strong>Research-Production Bridge</strong>
+      Anyone interested in the gap between academic research and real-world deployment
+    </div>
+  </div>
+
+  <h3>Subject Areas</h3>
+  <p>
+    <strong>Primary:</strong> Multi-object tracking and re-identification.<br/>
+    <strong>Secondary:</strong> Camera calibration &amp; 3D reconstruction; action/event recognition;
+    real-time CV systems; applications in retail automation; deep learning for correspondence.
+  </p>
+</section>
+
+<!-- ── Resources ── -->
+<section id="resources">
+  <h2>Resources</h2>
+
+  <h3>Planned Materials (Public GitHub Repository)</h3>
+  <ul style="margin: 0.5rem 0 1.25rem 1.25rem; font-size: 0.9rem;">
+    <li><strong>Slides:</strong> 150+ slides with speaker notes (PDF/PPT)</li>
+    <li><strong>Code:</strong> Calibration pipeline (DL + conventional), tracking formulation, event detection, bandwidth calculators, visualization notebooks</li>
+    <li><strong>Toolkits:</strong> Feature matching examples, bundle adjustment, validation metrics, sample scenarios</li>
+    <li><strong>Reading list:</strong> Calibration papers, tracking methods, edge AI, retail automation</li>
+  </ul>
+
+  <h3>References</h3>
+  <ol class="refs">
+    <li>Sarlin et al., "SuperGlue: Learning Feature Matching with Graph Neural Networks," <em>CVPR 2020</em></li>
+    <li>Sun et al., "LoFTR: Detector-Free Local Feature Matching with Transformers," <em>CVPR 2021</em></li>
+    <li>Wojke et al., "DeepSORT: Simple Online and Realtime Tracking," <em>2017</em></li>
+    <li>Zhang et al., "ByteTrack: Multi-Object Tracking by Associating Every Detection Box," <em>2021</em></li>
+    <li>Schönberger &amp; Frahm, "Structure-from-Motion Revisited," <em>CVPR 2016</em></li>
+    <li>Bandara et al., "AdaMAE: Adaptive Masking for Efficient Spatiotemporal Learning," <em>CVPR 2023</em> (co-authored by M. Agarwal)</li>
+    <li>Agrawal et al., "Training Data Acquisition for Automated Checkout," US Patent US20220327511A1, <em>2022</em></li>
+    <li>Bernardin &amp; Stiefelhagen, "Evaluating Multiple Object Tracking Performance: The CLEAR MOT Metrics," <em>EURASIP 2008</em></li>
+    <li>Carreira &amp; Zisserman, "Quo Vadis, Action Recognition? A New Model and the Kinetics Dataset," <em>CVPR 2017</em></li>
+    <li>Lane et al., "DeepX: A Software Accelerator for Low-Power Deep Learning Inference on Mobile Devices," <em>IPSN 2016</em></li>
+  </ol>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <p>CVPR 2026 Tutorial &middot; Computer Vision at Scale: Checkout-Free Retail</p>
+  <p style="margin-top:0.4rem;">
+    Materials will be available on
+    <a href="https://github.com/tanmaniac/cvpr_checkout_free_tutorial">GitHub</a>
+    after the tutorial.
+  </p>
+</footer>
+
+</body>
+</html>
